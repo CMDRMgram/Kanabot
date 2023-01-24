@@ -69,7 +69,7 @@ async function sendClip(clip) {
 	.setColor('#FF7100')
 	.setTitle(clip.broadcaster_name)
 	.setURL(clip.url)
-	.setDescription(clip.title)
+	.setDescription(`${clip.title} clipped by ${clip.creator_name} at ${clip.created_at}`)
 	.setImage(clip.thumbnail_url)
 	bot.channels.cache.get(process.env.CLIPCHANNEL).send({ embeds: [embed],})
 }
@@ -90,7 +90,7 @@ async function CheckforClips() {
 	allclips = clips.data
 	allclips = allclips.filter(clip => channels.includes(clip.broadcaster_name) === true)
 	let clipIDs = []
-	clipIDs = await fs.readFileSync('./data.json', 'utf-8').split(',')
+	clipIDs = await fs.readFileSync('./files/data.json', 'utf-8').split(',')
 	for (let clip of allclips) {
 		if (clipIDs.includes(clip.id) == false) {
 			sendClip(clip)
@@ -99,7 +99,7 @@ async function CheckforClips() {
 			console.log(`Skipping clip: ${clip.id}`)
 		}
 	}
-	await fs.writeFileSync('./data.json', clipIDs.join(',') , 'utf-8');
+	await fs.writeFileSync('./files/data.json', clipIDs.join(',') , 'utf-8');
 }
 
 /**
