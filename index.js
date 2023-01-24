@@ -63,6 +63,17 @@ async function deployCommands() {
 	}
 }
 
+async function sendClip(clip) {
+	console.log(clip)
+	const embed = new EmbedBuilder()
+	.setColor('#FF7100')
+	.setTitle(clip.broadcaster_name)
+	.setURL(clip.url)
+	.setDescription(clip.title)
+	.setImage(clip.thumbnail_url)
+	bot.channels.cache.get(process.env.CLIPCHANNEL).send({ embeds: [embed],})
+}
+
 async function CheckforClips() {
 	console.log(`Fetching latest clips`)
 	let todayminus6min = new Date(Date.now() - 1000 * 360)
@@ -72,11 +83,9 @@ async function CheckforClips() {
 	today = today.toISOString().split('.')[0]+"Z"
 
 	let channels = await fs.readFileSync('./channels.json', 'utf-8').split(',')
-	console.log(channels)
 
 	let allclips = []
 	let clips = await twitch.getClips({game_id: '24241', first: 100, started_at: `${todayminus6min}`, ended_at: `${today}` });
-
 
 	allclips = clips.data
 	allclips = allclips.filter(clip => channels.includes(clip.broadcaster_name) === true)
@@ -84,14 +93,8 @@ async function CheckforClips() {
 	clipIDs = await fs.readFileSync('./data.json', 'utf-8').split(',')
 	for (let clip of allclips) {
 		if (clipIDs.includes(clip.id) == false) {
-            clipIDs.push(`${clip.id}`)
-			const embed = new EmbedBuilder()
-			.setColor('#FF7100')
-			.setTitle(clip.creator_name)
-			.setURL(clip.url)
-			.setDescription(clip.title)
-			.setImage(clip.thumbnail_url)
-			bot.channels.cache.get(process.env.CLIPCHANNEL).send({ embeds: [embed],})
+			sendClip(clip)
+			clipIDs.push(`${clip.id}`)
         } else {
 			console.log(`Skipping clip: ${clip.id}`)
 		}
