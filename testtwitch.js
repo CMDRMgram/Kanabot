@@ -1,6 +1,7 @@
 const TwitchApi = require("node-twitch").default;
 const Discord = require("discord.js");
 require("dotenv").config();
+const fs = require('fs');
 
 const twitch = new TwitchApi({
     client_id: `${process.env.TWITCHID}`,
@@ -26,9 +27,15 @@ async function getClips(){
         console.log(`Fetchin: ${clips.pagination}`)
     }
     allclips.pop()
+    let clipIDs = await fs.readFileSync('./data.json', 'utf-8').split(',')
     for (let clip of allclips) {
-        console.log(clip.title)
+        
+        if (clipIDs.includes(clip.id) == false) {
+            clipIDs.push(`${clip.id}`)
+        }
     }
+    console.log(clipIDs)
+    fs.writeFileSync('./data.json', clipIDs.join(',') , 'utf-8'); 
 
     //console.log(allclips)
 }

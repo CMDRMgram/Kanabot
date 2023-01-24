@@ -4,10 +4,17 @@ const { Client, IntentsBitField, EmbedBuilder, Collection } = require("discord.j
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
 const fs = require('fs');
+const cron = require('node-cron');
+const TwitchApi = require("node-twitch").default;
 
 // Discord client setup
 const serverIntents = new IntentsBitField(3276799);
 const bot = new Client({ intents: serverIntents })
+
+const twitch = new TwitchApi({
+	client_id: `${process.env.TWITCHID}`,
+	client_secret: `${process.env.TWITCHSECRET}`
+});
 
 // Command folder management
 bot.commands = new Collection();
@@ -56,6 +63,42 @@ async function deployCommands() {
 	}
 }
 
+async function CheckforClips() {
+	console.log(`Fetching latest clips`)
+	let todayminus6min = new Date(Date.now() - 1000 * 360)
+	let today = new Date()
+
+	todayminus6min = todayminus6min.toISOString().split('.')[0]+"Z"
+	today = today.toISOString().split('.')[0]+"Z"
+
+	let channels = await fs.readFileSync('./channels.json', 'utf-8').split(',')
+	console.log(channels)
+
+	let allclips = []
+	let clips = await twitch.getClips({game_id: '24241', first: 100, started_at: `${todayminus6min}`, ended_at: `${today}` });
+
+
+	allclips = clips.data
+	allclips = allclips.filter(clip => channels.includes(clip.broadcaster_name) === true)
+	let clipIDs = []
+	clipIDs = await fs.readFileSync('./data.json', 'utf-8').split(',')
+	for (let clip of allclips) {
+		if (clipIDs.includes(clip.id) == false) {
+            clipIDs.push(`${clip.id}`)
+			const embed = new EmbedBuilder()
+			.setColor('#FF7100')
+			.setTitle(clip.creator_name)
+			.setURL(clip.url)
+			.setDescription(clip.title)
+			.setImage(clip.thumbnail_url)
+			bot.channels.cache.get(process.env.CLIPCHANNEL).send({ embeds: [embed],})
+        } else {
+			console.log(`Skipping clip: ${clip.id}`)
+		}
+	}
+	await fs.writeFileSync('./data.json', clipIDs.join(',') , 'utf-8');
+}
+
 /**
  * Event handler for Bot Login, manages post-login setup
  * @author  (Mgram) Marcus Ingram
@@ -63,6 +106,10 @@ async function deployCommands() {
 bot.once("ready", async() => {
 	await deployCommands();
 	console.log(`✅ bot is now online! logged in as ${bot.user.tag}`)
+	CheckforClips()
+	cron.schedule('*/10 * * * *', function () {
+		CheckforClips()
+	});
 })
 
 /**
