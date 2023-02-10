@@ -63,44 +63,7 @@ async function deployCommands() {
 	}
 }
 
-async function sendClip(clip) {
-	console.log(clip)
-	const embed = new EmbedBuilder()
-	.setColor('#FF7100')
-	.setTitle(clip.broadcaster_name)
-	.setURL(clip.url)
-	.setDescription(`${clip.title} clipped by ${clip.creator_name} at ${clip.created_at}`)
-	.setImage(clip.thumbnail_url)
-	bot.channels.cache.get(process.env.CLIPCHANNEL).send({ embeds: [embed],})
-}
 
-async function CheckforClips() {
-	console.log(`Fetching latest clips`)
-	let todayminus6min = new Date(Date.now() - 1000 * 360)
-	let today = new Date()
-
-	todayminus6min = todayminus6min.toISOString().split('.')[0]+"Z"
-	today = today.toISOString().split('.')[0]+"Z"
-
-	let channels = await fs.readFileSync('./channels.json', 'utf-8').split(',')
-
-	let allclips = []
-	let clips = await twitch.getClips({game_id: '24241', first: 100, started_at: `${todayminus6min}`, ended_at: `${today}` });
-
-	allclips = clips.data
-	allclips = allclips.filter(clip => channels.includes(clip.broadcaster_name) === true)
-	let clipIDs = []
-	clipIDs = await fs.readFileSync('./files/data.json', 'utf-8').split(',')
-	for (let clip of allclips) {
-		if (clipIDs.includes(clip.id) == false) {
-			sendClip(clip)
-			clipIDs.push(`${clip.id}`)
-        } else {
-			console.log(`Skipping clip: ${clip.id}`)
-		}
-	}
-	await fs.writeFileSync('./files/data.json', clipIDs.join(',') , 'utf-8');
-}
 
 /**
  * Event handler for Bot Login, manages post-login setup
@@ -109,10 +72,6 @@ async function CheckforClips() {
 bot.once("ready", async() => {
 	await deployCommands();
 	console.log(`✅ bot is now online! logged in as ${bot.user.tag}`)
-	CheckforClips()
-	cron.schedule('*/10 * * * *', function () {
-		CheckforClips()
-	});
 })
 
 /**
@@ -131,6 +90,30 @@ bot.on('interactionCreate', async interaction => {
 		} catch (error) {
 			console.error(error);
 			await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+		}
+	}
+
+	if (interaction.isButton()) {
+		if (interaction.customId === "tankrole") {
+			interaction.deferUpdate();
+			interaction.member.roles.add("971728838100910140")
+			interaction.member.roles.remove("971728859017920513")
+			interaction.member.roles.remove("971728899547480125")
+		} else if (interaction.customId === "healrole") {
+			interaction.deferUpdate();
+			interaction.member.roles.add("971728859017920513")
+			interaction.member.roles.remove("971728838100910140")
+			interaction.member.roles.remove("971728899547480125")
+		} else if (interaction.customId === "dpsrole") {
+			interaction.deferUpdate();
+			interaction.member.roles.add("971728899547480125")
+			interaction.member.roles.remove("971728838100910140")
+			interaction.member.roles.remove("971728859017920513")
+		} else if (interaction.customId === "norole") {
+			interaction.deferUpdate();
+			interaction.member.roles.remove("971728899547480125")
+			interaction.member.roles.remove("971728838100910140")
+			interaction.member.roles.remove("971728859017920513")
 		}
 	}
 });
