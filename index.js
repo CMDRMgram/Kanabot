@@ -4,17 +4,11 @@ const { Client, IntentsBitField, EmbedBuilder, Collection } = require("discord.j
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
 const fs = require('fs');
-const cron = require('node-cron');
-const TwitchApi = require("node-twitch").default;
 
 // Discord client setup
 const serverIntents = new IntentsBitField(3276799);
 const bot = new Client({ intents: serverIntents })
 
-const twitch = new TwitchApi({
-	client_id: `${process.env.TWITCHID}`,
-	client_secret: `${process.env.TWITCHSECRET}`
-});
 
 // Command folder management
 bot.commands = new Collection();
