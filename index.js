@@ -92,6 +92,17 @@ bot.on('interactionCreate', async interaction => {
 			await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
 		}
 	}
+	
+	function removeColors() {
+		interaction.member.roles.remove("1074484970158030879")
+		interaction.member.roles.remove("1074485067302309959")
+		interaction.member.roles.remove("1074485131357720626")
+		interaction.member.roles.remove("1074485178174550017")
+		interaction.member.roles.remove("1074485239398813756")
+		interaction.member.roles.remove("1074485296743321710")
+		interaction.member.roles.remove("1074485344151552082")
+		interaction.member.roles.remove("1074485432089313411")
+	}
 
 	if (interaction.isButton()) {
 		if (interaction.customId === "tankrole") {
