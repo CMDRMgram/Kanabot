@@ -166,6 +166,7 @@ bot.on('interactionCreate', async interaction => {
 				console.log('no matching option found for button pressed')
 			
 		}
+		console.log(`Role assignment used by ${interaction.member.tag}`)
 	}
 });
 
