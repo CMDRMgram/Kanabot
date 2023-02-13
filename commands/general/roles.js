@@ -5,7 +5,6 @@ module.exports = {
     data: new Discord.SlashCommandBuilder()
     .setName(`roles`)
     .setDescription(`Select your preferred main role`),
-    permissions: 2,
     async execute (interaction) {
         const returnEmbed = new Discord.EmbedBuilder()
 		.setColor('#FF7100')

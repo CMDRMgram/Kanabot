@@ -4,6 +4,6 @@ module.exports = {
     .setName(`ping`)
     .setDescription(`pong`),
     execute (interaction) {
-        interaction.reply({ content: `Pong!` });
+        interaction.reply({ content: `Pong! 🏓` });
     }
 }
