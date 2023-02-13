@@ -93,7 +93,7 @@ bot.on('interactionCreate', async interaction => {
 		}
 	}
 	
-	function removeColors() {
+	async function setColors(newColor) {
 		interaction.member.roles.remove("1074484970158030879")
 		interaction.member.roles.remove("1074485067302309959")
 		interaction.member.roles.remove("1074485131357720626")
@@ -102,71 +102,61 @@ bot.on('interactionCreate', async interaction => {
 		interaction.member.roles.remove("1074485296743321710")
 		interaction.member.roles.remove("1074485344151552082")
 		interaction.member.roles.remove("1074485432089313411")
+		interaction.member.roles.add(`${newColor}`)
 	}
 
 	if (interaction.isButton()) {
+		interaction.deferUpdate();
 		switch (interaction.customId) {
 			case "tankrole":
-				interaction.deferUpdate();
 				interaction.member.roles.add("971728838100910140")
 				interaction.member.roles.remove("971728859017920513")
 				interaction.member.roles.remove("971728899547480125")
 				break;
 			case "healrole":
-				interaction.deferUpdate();
 				interaction.member.roles.add("971728859017920513")
 				interaction.member.roles.remove("971728838100910140")
 				interaction.member.roles.remove("971728899547480125")
 				break;
 			case "dpsrole":
-				interaction.deferUpdate();
 				interaction.member.roles.add("971728899547480125")
 				interaction.member.roles.remove("971728838100910140")
 				interaction.member.roles.remove("971728859017920513")
 				break;
 			case "norole":
-				interaction.deferUpdate();
 				interaction.member.roles.remove("971728899547480125")
 				interaction.member.roles.remove("971728838100910140")
 				interaction.member.roles.remove("971728859017920513")
 				break;
 			case "colorpink":
-				removeColors();
-				interaction.member.roles.add("1074484970158030879")
+				setColors("1074484970158030879")
 				break;
 			case "colorpurple":
-				removeColors();
-				interaction.member.roles.add("1074485067302309959")
+				setColors("1074485067302309959")
 				break;
 			case "colorblue":
-				removeColors();
-				interaction.member.roles.add("1074485131357720626")
+				setColors("1074485131357720626")
 				break;
 			case "colorgreen":
-				removeColors();
-				interaction.member.roles.add("1074485178174550017")
+				setColors("1074485178174550017")
 				break;
 			case "coloryellow":
-				removeColors();
-				interaction.member.roles.add("1074485239398813756")
+				setColors("1074485239398813756")
 				break;
 			case "colorred":
-				removeColors();
-				interaction.member.roles.add("1074485296743321710")
+				setColors("1074485296743321710")
 				break;
 			case "colororange":
-				removeColors();
-				interaction.member.roles.add("1074485344151552082")
+				setColors("1074485344151552082")
 				break;
 			case "colorcyan":
-				removeColors();
-				interaction.member.roles.add("1074485432089313411")
+				setColors("1074485432089313411")
 				break;
 			default:
 				console.log('no matching option found for button pressed')
 			
 		}
-		console.log(`Role assignment used by ${interaction.member.tag}`)
+		console.log(`Role assignment used by ${interaction.member}`)
 	}
 });
 
